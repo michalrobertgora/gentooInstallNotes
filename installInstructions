@@ -3,7 +3,7 @@
 # partitions
 parted -a optimal /dev/sda
 # had some pain-in-the-ass problems with GPT booting on Lenovo - maybe go with msdos? below in mklabel
-mklabel
+mklabel gpt
 unit mib
 mkpart primary 1 3
 name 1 grub
@@ -108,19 +108,25 @@ eselect profile list
 eselect profile set [PROPER hardened profile]
 source /etc/profile
 
+# THIS PART IS AN UTTER MESS - it comes from hardened guide and selinux guide, which are
+#focused on switching to hardened from existing & working distro
+#i tried to put it into intstallation process and probably messed a lot - it might be better
+# to skip this part, and come back to those guides when working repo is OK
+https://wiki.gentoo.org/wiki/Hardened/FAQ#How_do_I_switch_to_the_hardened_profile.3F
+https://wiki.gentoo.org/wiki/SELinux/Installation#Performing_a_standard_installation
 # below are cmds from hardened guide - check url above
-emerge --oneshot gcc
-emerge --oneshot binutils virtual/libc
+# emerge --oneshot gcc
+# emerge --oneshot binutils virtual/libc
 #select proper from list - probably one without suffix, NOT VANILLA (vanilla isnt hardened)
-gcc-config -l
+# gcc-config -l
 #again
-source /etc/profile
+# source /etc/profile
 #check for prelink - hardened doesnt work with it
-emerge -a --depclean prelink
+# emerge -a --depclean prelink
 # reinstall
-emerge --emptytree --verbose @world
-#additional system management for hardened
-emerge --ask hardened-sources
+#emerge -e --keep-going @system 
+#emerge -e --keep-going @world
+# END OF A MESS
 
 echo "Europe/Warsaw" > /etc/timezone
 emerge --config sys-libs/timezone-data
@@ -140,12 +146,13 @@ env-update && source /etc/profile
 # MG wyżej brakuje export PS1="(chroot) $PS1"; był robiony w 81, ale w dokumentacji był i tam, i tu; czemu?
 
 
-#emerge kernel: UPDATE?
-# emerge -av =sys-kernel/gentoo-sources-4.3.4
+#emerge kernel: no version, so it will install latesst stable
+# GO FOR HARDENED SOURCES IF YOU WISH
+# emerge -av =sys-kernel/
 # YES
 etc-update
 # -5
-# emerge -av =sys-kernel/gentoo-sources-4.3.4
+# emerge -av =sys-kernel/
 
 #kernel compilation
 cd /usr/src/linux
@@ -154,6 +161,11 @@ wget https://raw.githubusercontent.com/michalrobertgora/gentooInstallNotes/maste
 # wget https://github.com/paweld2/gentooInstallNotes/raw/master/kernelConfig
 mv kernelConfig .config
 make clean && make -j8 && make modules_install && make install
+# NOW CHECK FOR ADDITIONAL KERNEL CONFIG FOR SELINUX, ETC, (SELINUX URL)
+# make menuconfig
+# make modules_install
+# make install
+
 
 mkdir -p /boot/efi/boot
 cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
