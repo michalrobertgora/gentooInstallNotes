@@ -33,19 +33,32 @@ mkdir /mnt/gentoo/boot
 mount /dev/sda2 /mnt/gentoo/boot
 cd /mnt/gentoo
 
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.CONTENTS
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.DIGESTS
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.DIGESTS.asc
+# OLD FOR REFERENCE
+# wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2
+# wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.CONTENTS
+# wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.DIGESTS
+# wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.DIGESTS.asc
 
-openssl dgst -r -sha512 stage3-amd64-20160128.tar.bz2
-sha512sum stage3-amd64-20160128.tar.bz2
-openssl dgst -r -whirlpool stage3-amd64-20160128.tar.bz2
+# Feb 2017
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.CONTENTS
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.DIGESTS
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.DIGESTS.asc
+
+
+#OLD - for reference
+#openssl dgst -r -sha512 stage3-amd64-20160128.tar.bz2
+#sha512sum stage3-amd64-20160128.tar.bz2
+#openssl dgst -r -whirlpool stage3-amd64-20160128.tar.bz2
+
+openssl dgst -r -sha512 stage3-amd64-hardened-20170209.tar.bz2
+sha512sum stage3-amd64-hardened-20170209.tar.bz2
+openssl dgst -r -whirlpool stage3-amd64-hardened-20170209.tar.bz2
 
 gpg --recv-keys 0xBB572E0E2D182910
-gpg --verify stage3-amd64-20160121.tar.bz2.DIGESTS.asc
+gpg --verify stage3-amd64-hardened-20170209.tar.bz2.DIGESTS.asc
 
-tar xvjpf stage3-amd64-20160128.tar.bz2 --xattrs
+tar xvjpf stage3-amd64-hardened-20170209.tar.bz2 --xattrs
 
 
 ## Configuring compile options
@@ -86,7 +99,8 @@ passwd
 emerge-webrsync
 emerge --sync --quiet
 
-eselect profile set default/linux/amd64/13.0/systemd
+# SELECT PROPER PROFILE
+# eselect profile set default/linux/amd64/13.0/systemd
 
 # @MG tu są różnice wynikające z systemd - zrozumieć, wypytać.
 
@@ -108,17 +122,18 @@ env-update && source /etc/profile
 # MG wyżej brakuje export PS1="(chroot) $PS1"; był robiony w 81, ale w dokumentacji był i tam, i tu; czemu?
 
 
-#emerge kernel:
-emerge -av =sys-kernel/gentoo-sources-4.3.4
+#emerge kernel: UPDATE?
+# emerge -av =sys-kernel/gentoo-sources-4.3.4
 # YES
 etc-update
 # -5
-emerge -av =sys-kernel/gentoo-sources-4.3.4
+# emerge -av =sys-kernel/gentoo-sources-4.3.4
 
 #kernel compilation
 cd /usr/src/linux
 # download prepared configuration
-wget https://github.com/paweld2/gentooInstallNotes/raw/master/kernelConfig
+wget https://raw.githubusercontent.com/michalrobertgora/gentooInstallNotes/master/kernelConfig
+# wget https://github.com/paweld2/gentooInstallNotes/raw/master/kernelConfig
 mv kernelConfig .config
 make clean && make -j8 && make modules_install && make install
 
