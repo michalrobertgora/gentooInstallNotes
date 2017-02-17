@@ -2,7 +2,8 @@
 
 # partitions
 parted -a optimal /dev/sda
-mklabel gpt
+# had some pain-in-the-ass problems with GPT booting on Lenovo - maybe go with msdos? below in mklabel
+mklabel
 unit mib
 mkpart primary 1 3
 name 1 grub
@@ -100,9 +101,26 @@ emerge-webrsync
 emerge --sync --quiet
 
 # SELECT PROPER PROFILE
+# if its hardened - read more, because there's few more things to run after that
+# https://wiki.gentoo.org/wiki/Hardened_Gentoo
 # eselect profile set default/linux/amd64/13.0/systemd
+eselect profile list
+eselect profile set [PROPER hardened profile]
+source /etc/profile
 
-# @MG tu są różnice wynikające z systemd - zrozumieć, wypytać.
+# below are cmds from hardened guide - check url above
+emerge --oneshot gcc
+emerge --oneshot binutils virtual/libc
+#select proper from list - probably one without suffix, NOT VANILLA (vanilla isnt hardened)
+gcc-config -l
+#again
+source /etc/profile
+#check for prelink - hardened doesnt work with it
+emerge -a --depclean prelink
+# reinstall
+emerge --emptytree --verbose @world
+#additional system management for hardened
+emerge --ask hardened-sources
 
 echo "Europe/Warsaw" > /etc/timezone
 emerge --config sys-libs/timezone-data
