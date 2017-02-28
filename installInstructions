@@ -41,25 +41,21 @@ cd /mnt/gentoo
 # wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20160128.tar.bz2.DIGESTS.asc
 
 # Feb 2017
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.CONTENTS
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.DIGESTS
-wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64-hardened/stage3-amd64-hardened-20170209.tar.bz2.DIGESTS.asc
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170209.tar.bz2 
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170209.tar.bz2.CONTENTS
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170209.tar.bz2.DIGESTS
+wget http://ftp-stud.hs-esslingen.de/pub/Mirrors/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20170209.tar.bz2.DIGESTS.asc
 
 
-#OLD - for reference
-#openssl dgst -r -sha512 stage3-amd64-20160128.tar.bz2
-#sha512sum stage3-amd64-20160128.tar.bz2
-#openssl dgst -r -whirlpool stage3-amd64-20160128.tar.bz2
 
-openssl dgst -r -sha512 stage3-amd64-hardened-20170209.tar.bz2
-sha512sum stage3-amd64-hardened-20170209.tar.bz2
-openssl dgst -r -whirlpool stage3-amd64-hardened-20170209.tar.bz2
+openssl dgst -r -sha512 stage3-amd64-20170209.tar.bz2
+sha512sum stage3-amd64-20170209.tar.bz2
+openssl dgst -r -whirlpool stage3-amd64-20170209.tar.bz2
 
 gpg --recv-keys 0xBB572E0E2D182910
-gpg --verify stage3-amd64-hardened-20170209.tar.bz2.DIGESTS.asc
+gpg --verify stage3-amd64-20170209.tar.bz2.DIGESTS.asc
 
-tar xvjpf stage3-amd64-hardened-20170209.tar.bz2 --xattrs
+tar xvjpf stage3-amd64-20170209tar.bz2 --xattrs
 
 
 ## Configuring compile options
@@ -101,32 +97,10 @@ emerge-webrsync
 emerge --sync --quiet
 
 # SELECT PROPER PROFILE
-# if its hardened - read more, because there's few more things to run after that
-# https://wiki.gentoo.org/wiki/Hardened_Gentoo
-# eselect profile set default/linux/amd64/13.0/systemd
 eselect profile list
-eselect profile set [PROPER hardened profile]
+eselect profile set X
 source /etc/profile
 
-# THIS PART IS AN UTTER MESS - it comes from hardened guide and selinux guide, which are
-#focused on switching to hardened from existing & working distro
-#i tried to put it into intstallation process and probably messed a lot - it might be better
-# to skip this part, and come back to those guides when working repo is OK
-https://wiki.gentoo.org/wiki/Hardened/FAQ#How_do_I_switch_to_the_hardened_profile.3F
-https://wiki.gentoo.org/wiki/SELinux/Installation#Performing_a_standard_installation
-# below are cmds from hardened guide - check url above
-# emerge --oneshot gcc
-# emerge --oneshot binutils virtual/libc
-#select proper from list - probably one without suffix, NOT VANILLA (vanilla isnt hardened)
-# gcc-config -l
-#again
-# source /etc/profile
-#check for prelink - hardened doesnt work with it
-# emerge -a --depclean prelink
-# reinstall
-#emerge -e --keep-going @system 
-#emerge -e --keep-going @world
-# END OF A MESS
 
 echo "Europe/Warsaw" > /etc/timezone
 emerge --config sys-libs/timezone-data
@@ -147,7 +121,6 @@ env-update && source /etc/profile
 
 
 #emerge kernel: no version, so it will install latesst stable
-# GO FOR HARDENED SOURCES IF YOU WISH
 # emerge -av =sys-kernel/
 # YES
 etc-update
@@ -161,11 +134,6 @@ wget https://raw.githubusercontent.com/michalrobertgora/gentooInstallNotes/maste
 # wget https://github.com/paweld2/gentooInstallNotes/raw/master/kernelConfig
 mv kernelConfig .config
 make clean && make -j8 && make modules_install && make install
-# NOW CHECK FOR ADDITIONAL KERNEL CONFIG FOR SELINUX, ETC, (SELINUX URL)
-# make menuconfig
-# make modules_install
-# make install
-
 
 mkdir -p /boot/efi/boot
 cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
